@@ -1,11 +1,12 @@
 import Header from "./components/LayoutComponents/Header";
 import Footer from "./components/LayoutComponents/Footer";
+import Location from "./components/MainComponents/Location";
 
 export default function Home() {
   return (
     <div>
       <Header />
-      <h1>CONTENT</h1>
+      <Location />
       <Footer />
     </div>
   );
