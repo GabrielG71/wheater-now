@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { WeatherState } from "../types/weather";
 import { GeolocationPosition } from "../types/location";
 import { WeatherService } from "../services/weatherSerive";
@@ -19,7 +19,7 @@ export function useWeather(options: UseWeatherOptions = {}) {
     error: null,
   });
 
-  const fetchWeather = async () => {
+  const fetchWeather = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     try {
@@ -50,17 +50,22 @@ export function useWeather(options: UseWeatherOptions = {}) {
         error: error instanceof Error ? error.message : "Erro desconhecido",
       });
     }
-  };
+  }, [
+    options.coordinates?.latitude,
+    options.coordinates?.longitude,
+    options.city,
+    options.country,
+  ]);
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
     fetchWeather();
-  };
+  }, [fetchWeather]);
 
   useEffect(() => {
     if (options.autoFetch !== false && (options.coordinates || options.city)) {
       fetchWeather();
     }
-  }, [options.coordinates, options.city, options.country]);
+  }, [options.autoFetch, fetchWeather]);
 
   return {
     ...state,

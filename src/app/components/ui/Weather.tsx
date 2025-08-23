@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useWeather } from "../../hooks/useWheater";
 import { useLocation } from "../../hooks/useLocation";
 import { WeatherCard } from "../../components/ui/WeatherCard";
@@ -9,17 +10,22 @@ import { ErrorMessage } from "../../components/ui/ErrorMessage";
 export default function Weather() {
   const locationState = useLocation();
 
-  const weatherState = useWeather({
-    coordinates: locationState.data
-      ? {
-          latitude: 0,
-          longitude: 0,
-        }
-      : undefined,
-    city: locationState.data?.city,
-    country: locationState.data?.country,
-    autoFetch: !!locationState.data,
-  });
+  const weatherOptions = useMemo(
+    () => ({
+      city: locationState.data?.city,
+      country: locationState.data?.country,
+      autoFetch:
+        !!locationState.data && !locationState.loading && !locationState.error,
+    }),
+    [
+      locationState.data?.city,
+      locationState.data?.country,
+      locationState.loading,
+      locationState.error,
+    ]
+  );
+
+  const weatherState = useWeather(weatherOptions);
 
   const isLoading = locationState.loading || weatherState.loading;
   const error = locationState.error || weatherState.error;
@@ -66,7 +72,6 @@ export default function Weather() {
         </h2>
       </div>
       <WeatherCard weather={weatherState.data} />
-
       <div className="mt-6 text-center">
         <button
           onClick={weatherState.refetch}
