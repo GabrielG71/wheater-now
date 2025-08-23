@@ -4,12 +4,16 @@ import { WEATHER_API, WEATHER_UNITS } from "../constants/weather";
 
 export class WeatherService {
   private static validateApiKey(): void {
-    if (
-      !WEATHER_API.API_KEY ||
-      WEATHER_API.API_KEY === "d271dae5e63ade8450001d80cf5c1f47"
-    ) {
+    const apiKey =
+      process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || WEATHER_API.API_KEY;
+    if (!apiKey || apiKey === "YOUR_API_KEY_HERE" || apiKey.trim() === "") {
+      console.error("Variáveis de ambiente disponíveis:", {
+        NEXT_PUBLIC_OPENWEATHER_API_KEY:
+          process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY,
+        WEATHER_API_API_KEY: WEATHER_API.API_KEY,
+      });
       throw new Error(
-        "API Key do OpenWeatherMap não configurada. Adicione NEXT_PUBLIC_OPENWEATHER_API_KEY no seu .env.local"
+        "API Key do OpenWeatherMap não configurada. Verifique se NEXT_PUBLIC_OPENWEATHER_API_KEY está no .env.local e reinicie o servidor"
       );
     }
   }
@@ -22,7 +26,9 @@ export class WeatherService {
     const url = new URL(`${WEATHER_API.BASE_URL}/weather`);
     url.searchParams.append("lat", coords.latitude.toString());
     url.searchParams.append("lon", coords.longitude.toString());
-    url.searchParams.append("appid", WEATHER_API.API_KEY);
+    const apiKey =
+      process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || WEATHER_API.API_KEY;
+    url.searchParams.append("appid", apiKey);
     url.searchParams.append("units", WEATHER_UNITS.METRIC);
     url.searchParams.append("lang", "pt_br");
 
@@ -51,7 +57,9 @@ export class WeatherService {
     const query = country ? `${city},${country}` : city;
     const url = new URL(`${WEATHER_API.BASE_URL}/weather`);
     url.searchParams.append("q", query);
-    url.searchParams.append("appid", WEATHER_API.API_KEY);
+    const apiKey =
+      process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || WEATHER_API.API_KEY;
+    url.searchParams.append("appid", apiKey);
     url.searchParams.append("units", WEATHER_UNITS.METRIC);
     url.searchParams.append("lang", "pt_br");
 
